@@ -1,16 +1,17 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useCallback } from 'react';
 import ReactFlow, { 
   Controls, 
   Background, 
   MiniMap,
   Panel
 } from 'reactflow';
-import { MindMapNode } from './MindMapNode';
+import { ParentNode, ChildNode } from './MindMapNode';
 import { useReactFlow } from 'reactflow';
 import { FiMaximize2, FiRefreshCw, FiDownload, FiUpload } from 'react-icons/fi';
 
 const nodeTypes = {
-  mindmapNode: MindMapNode,
+  parentNode: ParentNode,
+  childNode: ChildNode,
 };
 
 export const MindMapView = ({
@@ -67,7 +68,7 @@ export const MindMapView = ({
     <div 
       ref={reactFlowWrapper} 
       className="w-full h-full"
-      style={{ background: isDarkMode ? '#1F2937' : '#F9FAFB' }}
+      style={{ background: isDarkMode ? '#111827' : '#F9FAFB' }}
     >
       <ReactFlow
         nodes={nodes}
@@ -81,16 +82,18 @@ export const MindMapView = ({
         nodeTypes={nodeTypes}
         defaultViewport={{ x: 100, y: 100, zoom: 0.8 }}
         minZoom={0.1}
-        maxZoom={2}
+        maxZoom={4}
         snapToGrid={true}
         snapGrid={[20, 20]}
-        connectionLineType="smoothstep"
+        connectionLineType="default"
+        connectionLineStyle={{ strokeWidth: 2, stroke: '#6B7280' }}
         fitView
       >
         <Background 
-          color={isDarkMode ? '#4B5563' : '#CBD5E1'} 
-          gap={20} 
+          color={isDarkMode ? '#374151' : '#E5E7EB'} 
+          gap={25}
           size={1}
+          variant="dots"
         />
         
         <Controls 
@@ -100,20 +103,12 @@ export const MindMapView = ({
         <MiniMap 
           nodeStrokeWidth={3}
           nodeColor={(node) => {
-            const colors = {
-              default: '#3B82F6',
-              topic: '#8B5CF6',
-              subtopic: '#10B981',
-              detail: '#F59E0B',
-              reference: '#6B7280'
-            };
-            return colors[node.data.type] || colors.default;
+            return node.data.color || '#3B82F6';
           }}
-          maskColor={isDarkMode ? 'rgba(31, 41, 55, 0.6)' : 'rgba(249, 250, 251, 0.6)'}
+          maskColor={isDarkMode ? 'rgba(17, 24, 39, 0.6)' : 'rgba(249, 250, 251, 0.6)'}
           className={`border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
         />
         
-        {/* Top panel with controls */}
         <Panel position="top-right" className="flex gap-2 m-4">
           <button
             onClick={handleFitView}

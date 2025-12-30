@@ -5,11 +5,51 @@ import {
   FiChevronDown, 
   FiEdit2, 
   FiPlus,
-  FiLink,
-  FiTag
+  FiTag,
+  FiCircle,
+  FiSquare,
+  FiHexagon
 } from 'react-icons/fi';
 
-export const MindMapNode = ({ data, id, selected }) => {
+const ShapeComponent = ({ shape, color, size = 40 }) => {
+  const styles = {
+    circle: {
+      width: size,
+      height: size,
+      borderRadius: '50%',
+      backgroundColor: color
+    },
+    oval: {
+      width: size * 1.5,
+      height: size,
+      borderRadius: '50%',
+      backgroundColor: color
+    },
+    rectangle: {
+      width: size * 1.5,
+      height: size,
+      borderRadius: '8px',
+      backgroundColor: color
+    },
+    square: {
+      width: size,
+      height: size,
+      borderRadius: '8px',
+      backgroundColor: color
+    },
+    diamond: {
+      width: size,
+      height: size,
+      backgroundColor: color,
+      transform: 'rotate(45deg)',
+      margin: 'auto'
+    }
+  };
+
+  return <div style={styles[shape] || styles.circle} />;
+};
+
+export const ParentNode = ({ data, id, selected }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [label, setLabel] = useState(data.label);
   
@@ -21,39 +61,157 @@ export const MindMapNode = ({ data, id, selected }) => {
   };
 
   const handleAddChild = () => {
-    data.onAddNode?.(id, 'subtopic');
+    data.onAddNode?.(id, 'child', 'oval');
   };
-
-  const handleCollapseExpand = () => {
-    data.onCollapseExpand?.(id);
-  };
-
-  const nodeColors = {
-    default: 'from-blue-500 to-blue-600',
-    topic: 'from-purple-500 to-purple-600',
-    subtopic: 'from-green-500 to-green-600',
-    detail: 'from-yellow-500 to-yellow-600',
-    reference: 'from-gray-500 to-gray-600'
-  };
-
-  const bgColor = nodeColors[data.type] || nodeColors.default;
 
   return (
-    <div className={`relative group ${selected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}>
-      {/* Input handles for multiple connections */}
+    <div className={`relative group ${selected ? 'ring-4 ring-blue-400 ring-opacity-50' : ''}`}>
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="w-4 h-4 bg-blue-500 border-2 border-white"
+      />
+      
+      <Handle
+        type="target"
+        position={Position.Right}
+        className="w-4 h-4 bg-blue-500 border-2 border-white"
+      />
+      
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        className="w-4 h-4 bg-blue-500 border-2 border-white"
+      />
+      
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="w-4 h-4 bg-blue-500 border-2 border-white"
+      />
+      
+      {/* Parent Node - Circle */}
+      <div className="flex flex-col items-center justify-center">
+        <div 
+          className="rounded-full shadow-xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105"
+          style={{ 
+            backgroundColor: data.color || '#3B82F6',
+            minWidth: '160px',
+            minHeight: '160px'
+          }}
+        >
+          <div className="text-center">
+            {isEditing ? (
+              <input
+                type="text"
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+                onBlur={handleLabelSubmit}
+                onKeyPress={(e) => e.key === 'Enter' && handleLabelSubmit()}
+                className="w-full bg-white/90 px-3 py-2 rounded text-gray-900 font-bold text-center text-lg"
+                autoFocus
+              />
+            ) : (
+              <h3 
+                className="font-bold text-xl text-white cursor-pointer mb-2"
+                onClick={() => setIsEditing(true)}
+                title="Click to edit"
+              >
+                {data.label}
+              </h3>
+            )}
+            
+            {data.summary && (
+              <p className="text-sm text-white/90 line-clamp-2 mb-3">
+                {data.summary}
+              </p>
+            )}
+            
+            <div className="flex justify-center gap-2">
+              <button
+                onClick={handleAddChild}
+                className="text-xs bg-white/30 hover:bg-white/40 text-white px-3 py-1 rounded-full flex items-center gap-1"
+                title="Add child node"
+              >
+                <FiPlus size={12} /> Add Child
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Children count */}
+        {(data.childrenCount || 0) > 0 && (
+          <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            {data.childrenCount} child nodes
+          </div>
+        )}
+      </div>
+      
+      <Handle
+        type="source"
+        position={Position.Top}
+        className="w-4 h-4 bg-green-500 border-2 border-white"
+      />
+      
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="w-4 h-4 bg-green-500 border-2 border-white"
+      />
+      
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="w-4 h-4 bg-green-500 border-2 border-white"
+      />
+      
+      <Handle
+        type="source"
+        position={Position.Left}
+        className="w-4 h-4 bg-green-500 border-2 border-white"
+      />
+    </div>
+  );
+};
+
+export const ChildNode = ({ data, id, selected }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [label, setLabel] = useState(data.label);
+  
+  const handleLabelSubmit = () => {
+    if (label.trim() !== '') {
+      data.onUpdateNode?.(id, { label });
+    }
+    setIsEditing(false);
+  };
+
+  const nodeStyles = {
+    oval: 'rounded-full',
+    rectangle: 'rounded-lg',
+    square: 'rounded-lg',
+    diamond: 'rotate-45'
+  };
+
+  const nodeShape = data.shape || 'oval';
+  const nodeColor = data.color || '#10B981';
+
+  return (
+    <div className={`relative group ${selected ? 'ring-2 ring-blue-400 ring-opacity-50' : ''}`}>
       <Handle
         type="target"
         position={Position.Left}
         className="w-3 h-3 bg-blue-500 border-2 border-white"
       />
       
-      {/* Node content */}
-      <div className={`relative rounded-lg shadow-lg p-4 min-w-[200px] transition-all duration-200 hover:shadow-xl ${
-        data.isExpanded ? 'bg-gradient-to-br' : 'bg-gradient-to-br from-gray-200 to-gray-300'
-      } ${data.isExpanded ? bgColor : 'from-gray-200 to-gray-300'} ${selected ? 'scale-105' : ''}`}>
-        
-        {/* Node header */}
-        <div className="flex items-center justify-between mb-2">
+      <div 
+        className={`shadow-lg p-4 transition-all duration-300 hover:shadow-xl hover:scale-105 ${nodeStyles[nodeShape]}`}
+        style={{ 
+          backgroundColor: nodeColor,
+          minWidth: '140px',
+          minHeight: '80px'
+        }}
+      >
+        <div className="text-center">
           {isEditing ? (
             <input
               type="text"
@@ -61,90 +219,39 @@ export const MindMapNode = ({ data, id, selected }) => {
               onChange={(e) => setLabel(e.target.value)}
               onBlur={handleLabelSubmit}
               onKeyPress={(e) => e.key === 'Enter' && handleLabelSubmit()}
-              className="flex-1 bg-white/90 px-2 py-1 rounded text-gray-900 font-bold"
+              className="w-full bg-white/90 px-2 py-1 rounded text-gray-900 font-bold text-center"
               autoFocus
             />
           ) : (
-            <h3 
-              className="font-bold text-lg text-white cursor-pointer"
+            <h4 
+              className="font-bold text-white cursor-pointer"
               onClick={() => setIsEditing(true)}
               title="Click to edit"
             >
               {data.label}
-              {(data.childrenCount || 0) > 0 && (
-                <span className="ml-2 text-xs bg-white/20 px-2 py-1 rounded">
-                  {data.childrenCount}
-                </span>
-              )}
-            </h3>
+            </h4>
           )}
           
-          {/* Expand/Collapse button */}
-          {(data.childrenCount || 0) > 0 && (
-            <button
-              onClick={handleCollapseExpand}
-              className="text-white hover:bg-white/20 p-1 rounded"
-              title={data.isExpanded ? 'Collapse' : 'Expand'}
-            >
-              {data.isExpanded ? <FiChevronDown /> : <FiChevronRight />}
-            </button>
+          {data.tags && data.tags.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-1 mt-2">
+              {data.tags.map((tag, index) => (
+                <span 
+                  key={index}
+                  className="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           )}
-        </div>
-        
-        {/* Tags */}
-        {data.tags && data.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-2">
-            {data.tags.map((tag, index) => (
-              <span 
-                key={index}
-                className="text-xs px-2 py-1 rounded-full bg-white/20 text-white flex items-center gap-1"
-              >
-                <FiTag size={10} />
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-        
-        {/* Summary (visible on node) */}
-        {data.summary && (
-          <p className="text-sm text-white/90 mb-3 line-clamp-2">
-            {data.summary}
-          </p>
-        )}
-        
-        {/* Quick actions */}
-        <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={handleAddChild}
-            className="text-xs bg-white/20 hover:bg-white/30 text-white px-2 py-1 rounded flex items-center gap-1"
-            title="Add child node"
-          >
-            <FiPlus size={12} /> Add Child
-          </button>
-          <button
-            onClick={() => setIsEditing(true)}
-            className="text-xs bg-white/20 hover:bg-white/30 text-white px-2 py-1 rounded flex items-center gap-1"
-            title="Edit node"
-          >
-            <FiEdit2 size={12} /> Edit
-          </button>
         </div>
       </div>
       
-      {/* Output handles for multiple connections */}
       <Handle
         type="source"
         position={Position.Right}
         className="w-3 h-3 bg-green-500 border-2 border-white"
       />
-      
-      {/* Connection indicators */}
-      {(data.connectionCount || 0) > 0 && (
-        <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-          {data.connectionCount}
-        </div>
-      )}
     </div>
   );
 };

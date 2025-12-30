@@ -1,108 +1,200 @@
 {
     "nodes": [
       {
-        "id": "root",
-        "type": "mindmapNode",
-        "position": { "x": 400, "y": 300 },
+        "id": "vitamins-main",
+        "type": "parentNode",
+        "position": { "x": 500, "y": 300 },
         "data": {
-          "label": "Main Topic",
-          "summary": "This is the central topic of the mindmap. It contains all major subtopics and serves as the starting point for exploration.",
-          "type": "topic",
-          "tags": ["central", "important", "core"],
+          "label": "Vitamins in Human Body",
+          "summary": "Essential organic compounds required in small amounts for normal physiological functions",
+          "type": "main",
+          "shape": "circle",
+          "color": "#3B82F6",
+          "tags": ["essential", "nutrition", "health"],
           "isExpanded": true,
-          "childrenCount": 3,
-          "connectionCount": 5,
+          "childrenCount": 4,
+          "connectionCount": 8,
           "createdAt": "2024-01-15",
           "updatedAt": "2024-01-20"
         }
       },
       {
-        "id": "subtopic-1",
-        "type": "mindmapNode",
-        "position": { "x": 200, "y": 100 },
+        "id": "classification",
+        "type": "childNode",
+        "position": { "x": 300, "y": 100 },
         "data": {
-          "label": "Subtopic A",
-          "summary": "First major subtopic with detailed information about specific aspects.",
-          "type": "subtopic",
-          "tags": ["category-a", "detailed"],
+          "label": "Vitamin Classification",
+          "summary": "Categorization based on solubility properties",
+          "type": "classification",
+          "shape": "oval",
+          "color": "#10B981",
+          "tags": ["categories", "properties"],
           "isExpanded": true,
           "childrenCount": 2,
           "connectionCount": 3
         }
       },
       {
-        "id": "subtopic-2",
-        "type": "mindmapNode",
-        "position": { "x": 200, "y": 300 },
+        "id": "fat-soluble",
+        "type": "childNode",
+        "position": { "x": 150, "y": 50 },
         "data": {
-          "label": "Subtopic B",
-          "summary": "Second subtopic covering alternative approaches and methods.",
-          "type": "subtopic",
-          "tags": ["category-b", "alternative"],
+          "label": "Fat-Soluble Vitamins",
+          "summary": "Vitamins A, D, E, K - stored in body fat",
+          "type": "subcategory",
+          "shape": "oval",
+          "color": "#8B5CF6",
+          "tags": ["A", "D", "E", "K", "storage"],
+          "isExpanded": true,
+          "childrenCount": 2,
+          "connectionCount": 2
+        }
+      },
+      {
+        "id": "water-soluble",
+        "type": "childNode",
+        "position": { "x": 450, "y": 50 },
+        "data": {
+          "label": "Water-Soluble Vitamins",
+          "summary": "B-complex and Vitamin C - not stored in body",
+          "type": "subcategory",
+          "shape": "oval",
+          "color": "#F59E0B",
+          "tags": ["B-complex", "Vitamin C", "daily intake"],
           "isExpanded": true,
           "childrenCount": 1,
           "connectionCount": 2
         }
       },
       {
-        "id": "detail-1",
-        "type": "mindmapNode",
-        "position": { "x": 50, "y": 50 },
+        "id": "vitamin-d",
+        "type": "childNode",
+        "position": { "x": 100, "y": 150 },
         "data": {
-          "label": "Detail 1.1",
-          "summary": "Specific detail or example related to subtopic A.",
-          "type": "detail",
-          "tags": ["example", "specific"],
+          "label": "Vitamin D",
+          "summary": "Essential for calcium absorption and bone health",
+          "type": "specific",
+          "shape": "rectangle",
+          "color": "#EC4899",
+          "tags": ["calcium", "bones", "sunlight"],
           "isExpanded": true,
           "childrenCount": 0,
           "connectionCount": 1
         }
       },
       {
-        "id": "reference-1",
-        "type": "mindmapNode",
-        "position": { "x": 600, "y": 100 },
+        "id": "vitamin-a",
+        "type": "childNode",
+        "position": { "x": 200, "y": 200 },
         "data": {
-          "label": "Reference Node",
-          "summary": "External reference or related concept that connects to multiple topics.",
-          "type": "reference",
-          "tags": ["cross-link", "reference"],
+          "label": "Vitamin A",
+          "summary": "Important for vision, immune function, and skin health",
+          "type": "specific",
+          "shape": "rectangle",
+          "color": "#EF4444",
+          "tags": ["vision", "immune", "skin"],
+          "isExpanded": true,
+          "childrenCount": 0,
+          "connectionCount": 1
+        }
+      },
+      {
+        "id": "bone-health",
+        "type": "childNode",
+        "position": { "x": 700, "y": 200 },
+        "data": {
+          "label": "Bone Health",
+          "summary": "Role of vitamins in maintaining skeletal structure",
+          "type": "function",
+          "shape": "diamond",
+          "color": "#14B8A6",
+          "tags": ["calcium", "structure", "minerals"],
           "isExpanded": true,
           "childrenCount": 0,
           "connectionCount": 2
+        }
+      },
+      {
+        "id": "immune-support",
+        "type": "childNode",
+        "position": { "x": 600, "y": 400 },
+        "data": {
+          "label": "Immune Support",
+          "summary": "Vitamins that enhance immune system function",
+          "type": "function",
+          "shape": "diamond",
+          "color": "#6366F1",
+          "tags": ["defense", "immunity", "protection"],
+          "isExpanded": true,
+          "childrenCount": 0,
+          "connectionCount": 1
+        }
+      },
+      {
+        "id": "dietary-sources",
+        "type": "childNode",
+        "position": { "x": 400, "y": 500 },
+        "data": {
+          "label": "Dietary Sources",
+          "summary": "Natural food sources of various vitamins",
+          "type": "source",
+          "shape": "square",
+          "color": "#10B981",
+          "tags": ["food", "nutrition", "sources"],
+          "isExpanded": true,
+          "childrenCount": 0,
+          "connectionCount": 1
         }
       }
     ],
     "edges": [
       {
-        "id": "edge-root-1",
-        "source": "root",
-        "target": "subtopic-1",
-        "type": "smoothstep"
+        "id": "edge-main-classification",
+        "source": "vitamins-main",
+        "target": "classification",
+        "type": "default"
       },
       {
-        "id": "edge-root-2",
-        "source": "root",
-        "target": "subtopic-2",
-        "type": "smoothstep"
+        "id": "edge-classification-fat",
+        "source": "classification",
+        "target": "fat-soluble",
+        "type": "default"
       },
       {
-        "id": "edge-1-1",
-        "source": "subtopic-1",
-        "target": "detail-1",
-        "type": "smoothstep"
+        "id": "edge-classification-water",
+        "source": "classification",
+        "target": "water-soluble",
+        "type": "default"
       },
       {
-        "id": "edge-root-ref",
-        "source": "root",
-        "target": "reference-1",
-        "type": "smoothstep"
+        "id": "edge-fat-vitamin-d",
+        "source": "fat-soluble",
+        "target": "vitamin-d",
+        "type": "default"
       },
       {
-        "id": "edge-2-ref",
-        "source": "subtopic-2",
-        "target": "reference-1",
-        "type": "smoothstep"
+        "id": "edge-fat-vitamin-a",
+        "source": "fat-soluble",
+        "target": "vitamin-a",
+        "type": "default"
+      },
+      {
+        "id": "edge-main-bone",
+        "source": "vitamins-main",
+        "target": "bone-health",
+        "type": "default"
+      },
+      {
+        "id": "edge-main-immune",
+        "source": "vitamins-main",
+        "target": "immune-support",
+        "type": "default"
+      },
+      {
+        "id": "edge-main-dietary",
+        "source": "vitamins-main",
+        "target": "dietary-sources",
+        "type": "default"
       }
     ]
   }

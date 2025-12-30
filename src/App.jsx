@@ -25,7 +25,9 @@ function App() {
     onUpdateNode,
     onAddNode,
     onDeleteNode,
-    onCollapseExpand
+    onCollapseExpand,
+    onChangeNodeShape,
+    onChangeNodeColor
   } = useMindMapStore();
 
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -35,26 +37,29 @@ function App() {
   }, [initializeMindMap]);
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <ReactFlowProvider>
         <div className="flex flex-col h-screen">
-          <header className={`flex items-center justify-between p-4 border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          {/* Header */}
+          <header className={`flex items-center justify-between p-4 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b`}>
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold">Interactive MindMap</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Interactive MindMap</h1>
               <ThemeToggle isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               Data-driven visualization from JSON
             </div>
           </header>
 
           <div className="flex flex-1 overflow-hidden">
             {/* Left Sidebar - Toolbar */}
-            <div className={`w-64 border-r ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+            <div className={`w-64 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r`}>
               <MindMapToolbar 
                 onFitView={onFitView}
                 onResetView={onResetView}
-                onAddNode={() => onAddNode()} // Add node without parent - will use selected or create root
+                onAddNode={() => onAddNode()}
+                onChangeNodeShape={onChangeNodeShape}
+                onChangeNodeColor={onChangeNodeColor}
                 isDarkMode={isDarkMode}
               />
             </div>
@@ -75,25 +80,25 @@ function App() {
             </div>
 
             {/* Right Sidebar - Node Details */}
-            <div className={`w-80 border-l ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+            <div className={`w-80 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-l`}>
               <SidePanel
                 node={selectedNode}
                 hoveredNode={hoveredNode}
                 onUpdateNode={onUpdateNode}
                 onDeleteNode={onDeleteNode}
                 onCollapseExpand={onCollapseExpand}
+                onChangeNodeShape={onChangeNodeShape}
+                onChangeNodeColor={onChangeNodeColor}
                 isDarkMode={isDarkMode}
               />
             </div>
           </div>
 
-          {/* Hover Info Panel (Floating) */}
+          {/* Hover Info Panel */}
           {hoveredNode && !selectedNode && (
-            <div className={`fixed bottom-4 right-4 max-w-sm p-4 rounded-lg shadow-lg z-50 ${
-              isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-            }`}>
-              <h3 className="font-bold mb-2">{hoveredNode.data.label}</h3>
-              <p className="text-sm opacity-80">{hoveredNode.data.summary}</p>
+            <div className={`fixed bottom-4 right-4 max-w-sm p-4 rounded-lg shadow-lg z-50 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+              <h3 className="font-bold mb-2 text-gray-900 dark:text-white">{hoveredNode.data.label}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{hoveredNode.data.summary}</p>
               <div className="mt-2 flex gap-2">
                 {hoveredNode.data.tags?.map((tag, index) => (
                   <span 

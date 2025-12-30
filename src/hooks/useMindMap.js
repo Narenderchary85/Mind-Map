@@ -13,7 +13,6 @@ export const useMindMapStore = create((set, get) => ({
   selectedNode: null,
   hoveredNode: null,
   
-  // Initialize from JSON data
   initializeMindMap: () => {
     const initialNodes = mindmapData.nodes.map(node => ({
       ...node,
@@ -21,8 +20,10 @@ export const useMindMapStore = create((set, get) => ({
         ...node.data,
         isExpanded: true,
         onUpdateNode: (id, updates) => get().onUpdateNode(id, updates),
-        onAddNode: (parentId, type) => get().onAddNode(parentId, type),
-        onCollapseExpand: (nodeId) => get().onCollapseExpand(nodeId)
+        onAddNode: (parentId, type, shape) => get().onAddNode(parentId, type, shape),
+        onCollapseExpand: (nodeId) => get().onCollapseExpand(nodeId),
+        onChangeNodeShape: (nodeId, shape) => get().onChangeNodeShape(nodeId, shape),
+        onChangeNodeColor: (nodeId, color) => get().onChangeNodeColor(nodeId, color)
       }
     }));
     
@@ -30,25 +31,24 @@ export const useMindMapStore = create((set, get) => ({
       nodes: initialNodes,
       edges: mindmapData.edges.map(edge => ({
         ...edge,
-        type: 'smoothstep',
+        type: 'default',
         markerEnd: {
-          type: MarkerType.Arrow,
-          height: '20px',
-          width: '20px'
+          type: MarkerType.ArrowClosed,
+          height: '15px',
+          width: '15px',
+          color: '#6B7280'
         },
         style: {
           strokeWidth: 2,
-          stroke: '#4B5563'
+          stroke: '#6B7280'
         }
       }))
     });
   },
   
-  // Node interactions
   onNodeClick: (event, node) => {
     const currentSelected = get().selectedNode;
     
-    // If clicking the same node, collapse/expand it
     if (currentSelected?.id === node.id) {
       get().onCollapseExpand(node.id);
     }
@@ -59,7 +59,6 @@ export const useMindMapStore = create((set, get) => ({
   onNodeMouseEnter: (event, node) => {
     set({ hoveredNode: node });
     
-    // Highlight connected edges
     const { edges } = get();
     const updatedEdges = edges.map(edge => ({
       ...edge,
@@ -68,7 +67,7 @@ export const useMindMapStore = create((set, get) => ({
         ...edge.style,
         stroke: (edge.source === node.id || edge.target === node.id) 
           ? '#3B82F6' 
-          : '#4B5563',
+          : '#6B7280',
         strokeWidth: (edge.source === node.id || edge.target === node.id) 
           ? 3 
           : 2
@@ -81,14 +80,13 @@ export const useMindMapStore = create((set, get) => ({
   onNodeMouseLeave: () => {
     const { hoveredNode } = get();
     if (hoveredNode) {
-      // Reset edge highlighting
       const { edges } = get();
       const updatedEdges = edges.map(edge => ({
         ...edge,
         animated: false,
         style: {
           ...edge.style,
-          stroke: '#4B5563',
+          stroke: '#6B7280',
           strokeWidth: 2
         }
       }));
@@ -100,7 +98,6 @@ export const useMindMapStore = create((set, get) => ({
     }
   },
   
-  // ReactFlow handlers
   onNodesChange: (changes) => {
     set({
       nodes: applyNodeChanges(changes, get().nodes),
@@ -117,31 +114,30 @@ export const useMindMapStore = create((set, get) => ({
     set({
       edges: addEdge({
         ...connection, 
-        type: 'smoothstep', 
+        type: 'default',
         animated: false,
         markerEnd: {
-          type: MarkerType.Arrow,
-          height: '20px',
-          width: '20px'
+          type: MarkerType.ArrowClosed,
+          height: '15px',
+          width: '15px',
+          color: '#6B7280'
         },
         style: {
           strokeWidth: 2,
-          stroke: '#4B5563'
+          stroke: '#6B7280'
         }
       }, get().edges),
     });
   },
   
-  // View controls
   onFitView: () => {
-    console.log('Fit to view - implement in view component');
+    console.log('Fit to view');
   },
   
   onResetView: () => {
-    console.log('Reset view - implement in view component');
+    console.log('Reset view');
   },
   
-  // Node operations
   onUpdateNode: (nodeId, updates) => {
     set({
       nodes: get().nodes.map(node => {
@@ -164,77 +160,88 @@ export const useMindMapStore = create((set, get) => ({
     });
   },
   
-  onAddNode: (parentId = null, type = 'default') => {
+  onAddNode: (parentId = null, type = 'subtopic', shape = 'oval') => {
     const nodes = get().nodes;
     
-    // If no parent specified and we have a selected node, use that
     if (!parentId && get().selectedNode) {
       parentId = get().selectedNode.id;
     }
     
-    // If still no parent, create a root node
     let parentNode;
     let newNodePosition;
     
     if (parentId && nodes.find(n => n.id === parentId)) {
       parentNode = nodes.find(n => n.id === parentId);
-      // Position new node to the right of parent
+      // Calculate position based on existing children
+      const childNodes = edges
+        .filter(e => e.source === parentId)
+        .map(e => nodes.find(n => n.id === e.target))
+        .filter(Boolean);
+      
+      const angleStep = (2 * Math.PI) / (childNodes.length + 1);
+      const radius = 200;
+      const angle = childNodes.length * angleStep;
+      
       newNodePosition = {
-        x: parentNode.position.x + 300,
-        y: parentNode.position.y
+        x: parentNode.position.x + radius * Math.cos(angle),
+        y: parentNode.position.y + radius * Math.sin(angle)
       };
     } else {
       // Create as root node
       newNodePosition = {
-        x: 400,
-        y: Math.max(...nodes.map(n => n.position.y), 0) + 150
+        x: 500 + (Math.random() - 0.5) * 200,
+        y: 300 + (Math.random() - 0.5) * 200
       };
     }
     
     const newNodeId = `node-${Date.now()}`;
+    const newNodeType = parentNode ? 'childNode' : 'parentNode';
+    
     const newNode = {
       id: newNodeId,
-      type: 'mindmapNode',
+      type: newNodeType,
       position: newNodePosition,
       data: {
         label: `New ${type} Node`,
         summary: 'Click to edit this node',
         type: type,
+        shape: shape,
+        color: parentNode ? '#10B981' : '#3B82F6',
         tags: ['new'],
         isExpanded: true,
-        children: [],
         childrenCount: 0,
         connectionCount: 0,
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString().split('T')[0],
         onUpdateNode: (id, updates) => get().onUpdateNode(id, updates),
-        onAddNode: (parentId, type) => get().onAddNode(parentId, type),
-        onCollapseExpand: (nodeId) => get().onCollapseExpand(nodeId)
+        onAddNode: (parentId, type, shape) => get().onAddNode(parentId, type, shape),
+        onCollapseExpand: (nodeId) => get().onCollapseExpand(nodeId),
+        onChangeNodeShape: (nodeId, shape) => get().onChangeNodeShape(nodeId, shape),
+        onChangeNodeColor: (nodeId, color) => get().onChangeNodeColor(nodeId, color)
       }
     };
     
     const newEdges = [...get().edges];
     
-    // If we have a parent, create edge between parent and new node
     if (parentNode) {
       const newEdge = {
         id: `edge-${parentNode.id}-${newNodeId}`,
         source: parentNode.id,
         target: newNodeId,
-        type: 'smoothstep',
+        type: 'default',
         markerEnd: {
-          type: MarkerType.Arrow,
-          height: '20px',
-          width: '20px'
+          type: MarkerType.ArrowClosed,
+          height: '15px',
+          width: '15px',
+          color: '#6B7280'
         },
         style: {
           strokeWidth: 2,
-          stroke: '#4B5563'
+          stroke: '#6B7280'
         }
       };
       newEdges.push(newEdge);
       
-      // Update parent's children count
       set({
         nodes: nodes.map(node => {
           if (node.id === parentNode.id) {
@@ -252,7 +259,6 @@ export const useMindMapStore = create((set, get) => ({
       });
     }
     
-    // Add the new node
     set({
       nodes: [...nodes, newNode],
       edges: newEdges,
@@ -265,14 +271,12 @@ export const useMindMapStore = create((set, get) => ({
     const edges = get().edges;
     const node = nodes.find(n => n.id === nodeId);
     
-    if (node && window.confirm(`Delete node "${node.data.label}" and all its connections?`)) {
-      // Remove node and its edges
+    if (node && window.confirm(`Delete node "${node.data.label}"?`)) {
       const newNodes = nodes.filter(n => n.id !== nodeId);
       const newEdges = edges.filter(e => 
         e.source !== nodeId && e.target !== nodeId
       );
       
-      // Update children count of parent nodes
       const updatedNodes = newNodes.map(n => {
         const childEdges = edges.filter(e => e.source === n.id && e.target === nodeId);
         if (childEdges.length > 0) {
@@ -312,6 +316,48 @@ export const useMindMapStore = create((set, get) => ({
         }
         return node;
       })
+    });
+  },
+  
+  onChangeNodeShape: (nodeId, shape) => {
+    set({
+      nodes: get().nodes.map(node => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              shape,
+              updatedAt: new Date().toISOString().split('T')[0]
+            }
+          };
+        }
+        return node;
+      }),
+      selectedNode: get().selectedNode?.id === nodeId 
+        ? { ...get().selectedNode, data: { ...get().selectedNode.data, shape } }
+        : get().selectedNode
+    });
+  },
+  
+  onChangeNodeColor: (nodeId, color) => {
+    set({
+      nodes: get().nodes.map(node => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              color,
+              updatedAt: new Date().toISOString().split('T')[0]
+            }
+          };
+        }
+        return node;
+      }),
+      selectedNode: get().selectedNode?.id === nodeId 
+        ? { ...get().selectedNode, data: { ...get().selectedNode.data, color } }
+        : get().selectedNode
     });
   }
 }));
