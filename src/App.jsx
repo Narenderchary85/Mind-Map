@@ -30,7 +30,6 @@ function App() {
 
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Initialize mindmap on component mount
   useEffect(() => {
     initializeMindMap();
   }, [initializeMindMap]);
@@ -39,7 +38,6 @@ function App() {
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <ReactFlowProvider>
         <div className="flex flex-col h-screen">
-          {/* Header */}
           <header className={`flex items-center justify-between p-4 border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-bold">Interactive MindMap</h1>
