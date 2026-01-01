@@ -12,26 +12,61 @@ export const useMindMapStore = create((set, get) => ({
   edges: [],
   selectedNode: null,
   hoveredNode: null,
+  nodeCounter: 1,
+  currentLevel: 0,
+  maxLevel: 3,
   
   initializeMindMap: () => {
-    const initialNodes = mindmapData.nodes.map(node => ({
-      ...node,
-      data: {
-        ...node.data,
-        isExpanded: true,
-        onUpdateNode: (id, updates) => get().onUpdateNode(id, updates),
-        onAddNode: (parentId, type, shape) => get().onAddNode(parentId, type, shape),
-        onCollapseExpand: (nodeId) => get().onCollapseExpand(nodeId),
-        onChangeNodeShape: (nodeId, shape) => get().onChangeNodeShape(nodeId, shape),
-        onChangeNodeColor: (nodeId, color) => get().onChangeNodeColor(nodeId, color)
+    // Calculate positions for circular layout
+    const processedNodes = mindmapData.nodes.map((node, index) => {
+      let position = { x: 0, y: 0 };
+      
+      // Set positions based on hierarchy
+      if (node.id === 'root') {
+        position = { x: 500, y: 300 }; // Center
+      } else if (node.id.startsWith('cat_')) {
+        // Category nodes arranged in a circle around root
+        const angle = (Math.PI * 2 * index) / 4;
+        const radius = 200;
+        position = {
+          x: 500 + radius * Math.cos(angle),
+          y: 300 + radius * Math.sin(angle)
+        };
+      } else if (node.id.startsWith('sub_')) {
+        // Subcategory nodes arranged around their parent
+        const parentId = mindmapData.hierarchy[node.id]?.[0];
+        if (parentId) {
+          const parentNode = mindmapData.nodes.find(n => n.id === parentId);
+          if (parentNode) {
+            const angle = (Math.PI * 2 * index) / 8;
+            const radius = 150;
+            position = {
+              x: 500 + radius * Math.cos(angle),
+              y: 300 + radius * Math.sin(angle)
+            };
+          }
+        }
       }
-    }));
+      
+      return {
+        ...node,
+        position,
+        data: {
+          ...node.data,
+          isExpanded: true,
+          level: getNodeLevel(node.id) || 0,
+          onUpdateNode: (id, updates) => get().onUpdateNode(id, updates),
+          onAddNode: (parentId, type) => get().onAddNode(parentId, type),
+          onCollapseExpand: (nodeId) => get().onCollapseExpand(nodeId)
+        }
+      };
+    });
     
     set({ 
-      nodes: initialNodes,
+      nodes: processedNodes,
       edges: mindmapData.edges.map(edge => ({
         ...edge,
-        type: 'default',
+        type: 'smoothstep',
         markerEnd: {
           type: MarkerType.ArrowClosed,
           height: '15px',
@@ -42,7 +77,9 @@ export const useMindMapStore = create((set, get) => ({
           strokeWidth: 2,
           stroke: '#6B7280'
         }
-      }))
+      })),
+      nodeCounter: mindmapData.nodes.length + 1,
+      maxLevel: calculateMaxLevel()
     });
   },
   
@@ -62,7 +99,6 @@ export const useMindMapStore = create((set, get) => ({
     const { edges } = get();
     const updatedEdges = edges.map(edge => ({
       ...edge,
-      animated: edge.source === node.id || edge.target === node.id,
       style: {
         ...edge.style,
         stroke: (edge.source === node.id || edge.target === node.id) 
@@ -83,7 +119,6 @@ export const useMindMapStore = create((set, get) => ({
       const { edges } = get();
       const updatedEdges = edges.map(edge => ({
         ...edge,
-        animated: false,
         style: {
           ...edge.style,
           stroke: '#6B7280',
@@ -114,7 +149,7 @@ export const useMindMapStore = create((set, get) => ({
     set({
       edges: addEdge({
         ...connection, 
-        type: 'default',
+        type: 'smoothstep', 
         animated: false,
         markerEnd: {
           type: MarkerType.ArrowClosed,
@@ -130,6 +165,7 @@ export const useMindMapStore = create((set, get) => ({
     });
   },
   
+  // View controls
   onFitView: () => {
     console.log('Fit to view');
   },
@@ -138,11 +174,70 @@ export const useMindMapStore = create((set, get) => ({
     console.log('Reset view');
   },
   
+  onExpandAll: () => {
+    set({
+      nodes: get().nodes.map(node => ({
+        ...node,
+        data: { ...node.data, isExpanded: true }
+      })),
+      currentLevel: get().maxLevel
+    });
+  },
+  
+  onCollapseAll: () => {
+    set({
+      nodes: get().nodes.map(node => ({
+        ...node,
+        data: { ...node.data, isExpanded: false }
+      })),
+      currentLevel: 0
+    });
+  },
+  
+  onDrillDown: () => {
+    const currentLevel = get().currentLevel;
+    const maxLevel = get().maxLevel;
+    
+    if (currentLevel < maxLevel) {
+      set({ currentLevel: currentLevel + 1 });
+      // Show nodes up to new level
+      get().showNodesUpToLevel(currentLevel + 1);
+    }
+  },
+  
+  onDrillUp: () => {
+    const currentLevel = get().currentLevel;
+    
+    if (currentLevel > 0) {
+      set({ currentLevel: currentLevel - 1 });
+      // Show nodes up to new level
+      get().showNodesUpToLevel(currentLevel - 1);
+    }
+  },
+  
+  showNodesUpToLevel: (targetLevel) => {
+    const nodes = get().nodes.map(node => {
+      const nodeLevel = node.data.level || 0;
+      const isVisible = nodeLevel <= targetLevel;
+      
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          isVisible: isVisible
+        }
+      };
+    });
+    
+    set({ nodes });
+  },
+  
+  // Node operations
   onUpdateNode: (nodeId, updates) => {
     set({
       nodes: get().nodes.map(node => {
         if (node.id === nodeId) {
-          const updatedNode = {
+          return {
             ...node,
             data: {
               ...node.data,
@@ -150,7 +245,6 @@ export const useMindMapStore = create((set, get) => ({
               updatedAt: new Date().toISOString().split('T')[0]
             }
           };
-          return updatedNode;
         }
         return node;
       }),
@@ -160,75 +254,71 @@ export const useMindMapStore = create((set, get) => ({
     });
   },
   
-  onAddNode: (parentId = null, type = 'subtopic', shape = 'oval') => {
+  onAddNode: (parentId = null, type = 'subtopic') => {
     const nodes = get().nodes;
     
     if (!parentId && get().selectedNode) {
       parentId = get().selectedNode.id;
     }
     
-    let parentNode;
-    let newNodePosition;
+    // Find parent node for positioning
+    const parentNode = parentId ? nodes.find(n => n.id === parentId) : null;
     
-    if (parentId && nodes.find(n => n.id === parentId)) {
-      parentNode = nodes.find(n => n.id === parentId);
-      // Calculate position based on existing children
-      const childNodes = edges
-        .filter(e => e.source === parentId)
-        .map(e => nodes.find(n => n.id === e.target))
-        .filter(Boolean);
+    // Calculate position based on parent or random
+    let position;
+    if (parentNode) {
+      // Position child near parent
+      const childCount = nodes.filter(n => 
+        get().edges.some(e => e.source === parentId && e.target === n.id)
+      ).length;
       
-      const angleStep = (2 * Math.PI) / (childNodes.length + 1);
-      const radius = 200;
-      const angle = childNodes.length * angleStep;
-      
-      newNodePosition = {
+      const angle = (Math.PI * 2 * childCount) / 8;
+      const radius = 150;
+      position = {
         x: parentNode.position.x + radius * Math.cos(angle),
         y: parentNode.position.y + radius * Math.sin(angle)
       };
     } else {
       // Create as root node
-      newNodePosition = {
-        x: 500 + (Math.random() - 0.5) * 200,
-        y: 300 + (Math.random() - 0.5) * 200
+      position = {
+        x: 300 + Math.random() * 400,
+        y: 200 + Math.random() * 200
       };
     }
     
-    const newNodeId = `node-${Date.now()}`;
-    const newNodeType = parentNode ? 'childNode' : 'parentNode';
+    const newNodeId = `node-${get().nodeCounter}`;
+    const newNodeLevel = parentNode ? (parentNode.data.level || 0) + 1 : 0;
     
     const newNode = {
       id: newNodeId,
-      type: newNodeType,
-      position: newNodePosition,
+      type: 'circularNode',
+      position,
       data: {
         label: `New ${type} Node`,
         summary: 'Click to edit this node',
         type: type,
-        shape: shape,
-        color: parentNode ? '#10B981' : '#3B82F6',
+        level: newNodeLevel,
         tags: ['new'],
         isExpanded: true,
+        isVisible: newNodeLevel <= get().currentLevel,
         childrenCount: 0,
         connectionCount: 0,
         createdAt: new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString().split('T')[0],
         onUpdateNode: (id, updates) => get().onUpdateNode(id, updates),
-        onAddNode: (parentId, type, shape) => get().onAddNode(parentId, type, shape),
-        onCollapseExpand: (nodeId) => get().onCollapseExpand(nodeId),
-        onChangeNodeShape: (nodeId, shape) => get().onChangeNodeShape(nodeId, shape),
-        onChangeNodeColor: (nodeId, color) => get().onChangeNodeColor(nodeId, color)
+        onAddNode: (parentId, type) => get().onAddNode(parentId, type),
+        onCollapseExpand: (nodeId) => get().onCollapseExpand(nodeId)
       }
     };
     
-    const newEdges = [...get().edges];
-    
+    // Add edge if there's a parent
+    let newEdges = [...get().edges];
     if (parentNode) {
       const newEdge = {
-        id: `edge-${parentNode.id}-${newNodeId}`,
-        source: parentNode.id,
+        id: `edge-${parentId}-${newNodeId}`,
+        source: parentId,
         target: newNodeId,
-        type: 'default',
+        type: 'smoothstep',
         markerEnd: {
           type: MarkerType.ArrowClosed,
           height: '15px',
@@ -241,32 +331,17 @@ export const useMindMapStore = create((set, get) => ({
         }
       };
       newEdges.push(newEdge);
-      
-      set({
-        nodes: nodes.map(node => {
-          if (node.id === parentNode.id) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                childrenCount: (node.data.childrenCount || 0) + 1
-              }
-            };
-          }
-          return node;
-        }),
-        edges: newEdges
-      });
     }
     
     set({
       nodes: [...nodes, newNode],
       edges: newEdges,
+      nodeCounter: get().nodeCounter + 1,
       selectedNode: newNode
     });
   },
   
-  onDeleteNode: (nodeId) => {
+  onRemoveNode: (nodeId) => {
     const nodes = get().nodes;
     const edges = get().edges;
     const node = nodes.find(n => n.id === nodeId);
@@ -277,25 +352,11 @@ export const useMindMapStore = create((set, get) => ({
         e.source !== nodeId && e.target !== nodeId
       );
       
-      const updatedNodes = newNodes.map(n => {
-        const childEdges = edges.filter(e => e.source === n.id && e.target === nodeId);
-        if (childEdges.length > 0) {
-          return {
-            ...n,
-            data: {
-              ...n.data,
-              childrenCount: Math.max(0, (n.data.childrenCount || 0) - 1)
-            }
-          };
-        }
-        return n;
-      });
-      
       set({
-        nodes: updatedNodes,
+        nodes: newNodes,
         edges: newEdges,
         selectedNode: get().selectedNode?.id === nodeId ? null : get().selectedNode,
-        hoveredNode: get().hoveredNode?.id === nodeId ? null : get().hoveredNode
+        hoveredNode: get().hovererNode?.id === nodeId ? null : get().hoveredNode
       });
     }
   },
@@ -361,3 +422,26 @@ export const useMindMapStore = create((set, get) => ({
     });
   }
 }));
+
+// Helper function to calculate node level from hierarchy
+function getNodeLevel(nodeId, hierarchy = mindmapData.hierarchy, level = 0) {
+  // Find parent of this node
+  for (const [parentId, children] of Object.entries(hierarchy)) {
+    if (children.includes(nodeId)) {
+      return getNodeLevel(parentId, hierarchy, level + 1);
+    }
+  }
+  return level;
+}
+
+// Calculate maximum depth of hierarchy
+function calculateMaxLevel() {
+  let maxLevel = 0;
+  
+  for (const nodeId of Object.keys(mindmapData.hierarchy)) {
+    const level = getNodeLevel(nodeId);
+    if (level > maxLevel) maxLevel = level;
+  }
+  
+  return maxLevel;
+}
