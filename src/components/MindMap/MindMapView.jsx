@@ -113,7 +113,6 @@ export const MindMapView = ({
           className={`border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
         />
         
-        {/* Top panel with controls */}
         <Panel position="top-right" className="flex gap-2 m-4">
           <button
             onClick={handleFitView}

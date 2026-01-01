@@ -44,11 +44,9 @@ export const useMindMapStore = create((set, get) => ({
     });
   },
   
-  // Node interactions
   onNodeClick: (event, node) => {
     const currentSelected = get().selectedNode;
     
-    // If clicking the same node, collapse/expand it
     if (currentSelected?.id === node.id) {
       get().onCollapseExpand(node.id);
     }
@@ -59,7 +57,6 @@ export const useMindMapStore = create((set, get) => ({
   onNodeMouseEnter: (event, node) => {
     set({ hoveredNode: node });
     
-    // Highlight connected edges
     const { edges } = get();
     const updatedEdges = edges.map(edge => ({
       ...edge,
@@ -81,7 +78,6 @@ export const useMindMapStore = create((set, get) => ({
   onNodeMouseLeave: () => {
     const { hoveredNode } = get();
     if (hoveredNode) {
-      // Reset edge highlighting
       const { edges } = get();
       const updatedEdges = edges.map(edge => ({
         ...edge,
@@ -99,8 +95,6 @@ export const useMindMapStore = create((set, get) => ({
       });
     }
   },
-  
-  // ReactFlow handlers
   onNodesChange: (changes) => {
     set({
       nodes: applyNodeChanges(changes, get().nodes),
@@ -131,8 +125,6 @@ export const useMindMapStore = create((set, get) => ({
       }, get().edges),
     });
   },
-  
-  // View controls
   onFitView: () => {
     console.log('Fit to view - implement in view component');
   },
@@ -140,8 +132,6 @@ export const useMindMapStore = create((set, get) => ({
   onResetView: () => {
     console.log('Reset view - implement in view component');
   },
-  
-  // Node operations
   onUpdateNode: (nodeId, updates) => {
     set({
       nodes: get().nodes.map(node => {
@@ -167,18 +157,14 @@ export const useMindMapStore = create((set, get) => ({
   onAddNode: (parentId = null, type = 'default') => {
     const nodes = get().nodes;
     
-    // If no parent specified and we have a selected node, use that
     if (!parentId && get().selectedNode) {
       parentId = get().selectedNode.id;
     }
-    
-    // If still no parent, create a root node
     let parentNode;
     let newNodePosition;
     
     if (parentId && nodes.find(n => n.id === parentId)) {
       parentNode = nodes.find(n => n.id === parentId);
-      // Position new node to the right of parent
       newNodePosition = {
         x: parentNode.position.x + 300,
         y: parentNode.position.y
