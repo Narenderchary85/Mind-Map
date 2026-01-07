@@ -49,17 +49,15 @@ function App() {
           </header>
 
           <div className="flex flex-1 overflow-hidden">
-            {/* Left Sidebar - Toolbar */}
             <div className={`w-64 border-r ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
               <MindMapToolbar 
                 onFitView={onFitView}
                 onResetView={onResetView}
-                onAddNode={() => onAddNode()} // Add node without parent - will use selected or create root
+                onAddNode={() => onAddNode()} 
                 isDarkMode={isDarkMode}
               />
             </div>
 
-            {/* Main MindMap Area */}
             <div className="flex-1 relative">
               <MindMapView
                 nodes={nodes}
@@ -74,7 +72,6 @@ function App() {
               />
             </div>
 
-            {/* Right Sidebar - Node Details */}
             <div className={`w-80 border-l ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
               <SidePanel
                 node={selectedNode}
@@ -87,7 +84,6 @@ function App() {
             </div>
           </div>
 
-          {/* Hover Info Panel (Floating) */}
           {hoveredNode && !selectedNode && (
             <div className={`fixed bottom-4 right-4 max-w-sm p-4 rounded-lg shadow-lg z-50 ${
               isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'

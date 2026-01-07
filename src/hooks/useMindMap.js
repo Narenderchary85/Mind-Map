@@ -13,7 +13,6 @@ export const useMindMapStore = create((set, get) => ({
   selectedNode: null,
   hoveredNode: null,
   
-  // Initialize from JSON data
   initializeMindMap: () => {
     const initialNodes = mindmapData.nodes.map(node => ({
       ...node,
@@ -220,7 +219,6 @@ export const useMindMapStore = create((set, get) => ({
       };
       newEdges.push(newEdge);
       
-      // Update parent's children count
       set({
         nodes: nodes.map(node => {
           if (node.id === parentNode.id) {
@@ -252,13 +250,11 @@ export const useMindMapStore = create((set, get) => ({
     const node = nodes.find(n => n.id === nodeId);
     
     if (node && window.confirm(`Delete node "${node.data.label}" and all its connections?`)) {
-      // Remove node and its edges
       const newNodes = nodes.filter(n => n.id !== nodeId);
       const newEdges = edges.filter(e => 
         e.source !== nodeId && e.target !== nodeId
       );
       
-      // Update children count of parent nodes
       const updatedNodes = newNodes.map(n => {
         const childEdges = edges.filter(e => e.source === n.id && e.target === nodeId);
         if (childEdges.length > 0) {
