@@ -53,7 +53,6 @@ export const MindMapView = ({
       reader.onload = (e) => {
         try {
           const data = JSON.parse(e.target.result);
-          // Update store with imported data
           console.log('Import data:', data);
         } catch (error) {
           console.error('Error parsing JSON:', error);

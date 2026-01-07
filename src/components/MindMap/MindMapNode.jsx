@@ -40,19 +40,15 @@ export const MindMapNode = ({ data, id, selected }) => {
 
   return (
     <div className={`relative group ${selected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}>
-      {/* Input handles for multiple connections */}
       <Handle
         type="target"
         position={Position.Left}
         className="w-3 h-3 bg-blue-500 border-2 border-white"
       />
-      
-      {/* Node content */}
       <div className={`relative rounded-lg shadow-lg p-4 min-w-[200px] transition-all duration-200 hover:shadow-xl ${
         data.isExpanded ? 'bg-gradient-to-br' : 'bg-gradient-to-br from-gray-200 to-gray-300'
       } ${data.isExpanded ? bgColor : 'from-gray-200 to-gray-300'} ${selected ? 'scale-105' : ''}`}>
         
-        {/* Node header */}
         <div className="flex items-center justify-between mb-2">
           {isEditing ? (
             <input
@@ -79,7 +75,6 @@ export const MindMapNode = ({ data, id, selected }) => {
             </h3>
           )}
           
-          {/* Expand/Collapse button */}
           {(data.childrenCount || 0) > 0 && (
             <button
               onClick={handleCollapseExpand}
@@ -91,7 +86,6 @@ export const MindMapNode = ({ data, id, selected }) => {
           )}
         </div>
         
-        {/* Tags */}
         {data.tags && data.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-2">
             {data.tags.map((tag, index) => (
@@ -106,14 +100,12 @@ export const MindMapNode = ({ data, id, selected }) => {
           </div>
         )}
         
-        {/* Summary (visible on node) */}
         {data.summary && (
           <p className="text-sm text-white/90 mb-3 line-clamp-2">
             {data.summary}
           </p>
         )}
         
-        {/* Quick actions */}
         <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={handleAddChild}
@@ -132,14 +124,11 @@ export const MindMapNode = ({ data, id, selected }) => {
         </div>
       </div>
       
-      {/* Output handles for multiple connections */}
       <Handle
         type="source"
         position={Position.Right}
         className="w-3 h-3 bg-green-500 border-2 border-white"
       />
-      
-      {/* Connection indicators */}
       {(data.connectionCount || 0) > 0 && (
         <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
           {data.connectionCount}

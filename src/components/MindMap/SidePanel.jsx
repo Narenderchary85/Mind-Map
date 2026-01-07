@@ -132,7 +132,6 @@ export const SidePanel = ({
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Summary Section */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold flex items-center gap-2">
@@ -182,7 +181,6 @@ export const SidePanel = ({
           )}
         </div>
 
-        {/* Tags Section */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold flex items-center gap-2">
