@@ -124,17 +124,7 @@ export const MindMapView = ({
           >
             <FiMaximize2 />
           </button>
-          <button
-            onClick={handleResetView}
-            className={`p-2 rounded-lg shadow flex items-center gap-2 ${
-              isDarkMode 
-                ? 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-700' 
-                : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'
-            }`}
-            title="Reset view"
-          >
-            <FiRefreshCw />
-          </button>
+      
           <button
             onClick={handleExport}
             className={`p-2 rounded-lg shadow flex items-center gap-2 ${

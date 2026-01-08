@@ -208,7 +208,7 @@ export const SidePanel = ({
               </span>
             ))}
           </div>
-          
+        
           <div className="flex gap-2">
             <input
               type="text"
@@ -230,8 +230,6 @@ export const SidePanel = ({
             </button>
           </div>
         </div>
-
-        {/* Metadata Section */}
         <div>
           <div 
             className="flex items-center justify-between mb-3 cursor-pointer"
@@ -268,8 +266,6 @@ export const SidePanel = ({
             </div>
           )}
         </div>
-
-        {/* JSON Data Section */}
         <div>
           <div 
             className="flex items-center justify-between mb-3 cursor-pointer"
@@ -289,8 +285,6 @@ export const SidePanel = ({
             </pre>
           )}
         </div>
-
-        {/* Quick Actions */}
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
           <h3 className="font-semibold mb-3">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-2">
