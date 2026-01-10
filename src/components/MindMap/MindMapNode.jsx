@@ -106,6 +106,23 @@ export const MindMapNode = ({ data, id, selected }) => {
           </p>
         )}
         
+        <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={handleAddChild}
+            className="text-xs bg-white/20 hover:bg-white/30 text-white px-2 py-1 rounded flex items-center gap-1"
+            title="Add child node"
+          >
+            <FiPlus size={12} /> Add Child
+          </button>
+          <button
+            onClick={() => setIsEditing(true)}
+            className="text-xs bg-white/20 hover:bg-white/30 text-white px-2 py-1 rounded flex items-center gap-1"
+            title="Edit node"
+          >
+            <FiEdit2 size={12} /> Edit
+          </button>
+        </div>
+      </div>
       
       <Handle
         type="source"
