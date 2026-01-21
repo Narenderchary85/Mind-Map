@@ -278,22 +278,5 @@ export const useMindMapStore = create((set, get) => ({
     }
   },
   
-  onCollapseExpand: (nodeId) => {
-    set({
-      nodes: get().nodes.map(node => {
-        if (node.id === nodeId) {
-          const isExpanded = !node.data.isExpanded;
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              isExpanded,
-              updatedAt: new Date().toISOString().split('T')[0]
-            }
-          };
-        }
-        return node;
-      })
-    });
-  }
+
 }));
