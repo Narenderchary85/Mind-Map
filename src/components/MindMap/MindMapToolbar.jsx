@@ -91,7 +91,25 @@ export const MindMapToolbar = ({
         </div>
       </div>
 
-
+      <div>
+        <h3 className="font-semibold mb-3 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-red-500"></span>
+          Data Management
+        </h3>
+        <div className="space-y-2">
+          <button
+            onClick={() => console.log('Save changes')}
+            className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
+              isDarkMode 
+                ? 'hover:bg-gray-700' 
+                : 'hover:bg-gray-100'
+            }`}
+          >
+            <FiSave className="text-green-500" />
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </div>
 
       <div className={`p-3 rounded-lg ${
         isDarkMode ? 'bg-gray-700/50' : 'bg-blue-50'
