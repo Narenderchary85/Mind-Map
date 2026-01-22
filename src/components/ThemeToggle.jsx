@@ -10,19 +10,7 @@ export const ThemeToggle = ({ isDarkMode, setIsDarkMode }) => {
       }`}
       aria-label="Toggle dark mode"
     >
-      <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-          isDarkMode ? 'translate-x-6' : 'translate-x-1'
-        }`}
-      >
-        <span className="absolute inset-0 flex items-center justify-center">
-          {isDarkMode ? (
-            <FiMoon size={10} className="text-gray-800" />
-          ) : (
-            <FiSun size={10} className="text-yellow-500" />
-          )}
-        </span>
-      </span>
+      
     </button>
   );
 };
