@@ -33,17 +33,7 @@ export const SidePanel = ({
   if (!displayNode) {
     return (
       <div className="p-6 h-full flex flex-col items-center justify-center">
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-          isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
-        }`}>
-          <FiLink size={24} className={isDarkMode ? 'text-gray-400' : 'text-gray-500'} />
-        </div>
-        <h3 className="text-lg font-medium mb-2">No Node Selected</h3>
-        <p className="text-center opacity-70">
-          Click on any node to view and edit its details here.
-          <br />
-          Hover over nodes for quick information.
-        </p>
+       
       </div>
     );
   }
