@@ -188,7 +188,26 @@ export const SidePanel = ({
             </h3>
           </div>
           
-
+          <div className="flex flex-wrap gap-2 mb-3">
+            {displayNode.data.tags?.map((tag, index) => (
+              <span 
+                key={index}
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm ${
+                  isDarkMode 
+                    ? 'bg-gray-700' 
+                    : 'bg-blue-100 text-blue-800'
+                }`}
+              >
+                {tag}
+                <button
+                  onClick={() => handleRemoveTag(tag)}
+                  className="opacity-70 hover:opacity-100"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
         
           <div className="flex gap-2">
             <input
