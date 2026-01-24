@@ -33,7 +33,17 @@ export const SidePanel = ({
   if (!displayNode) {
     return (
       <div className="p-6 h-full flex flex-col items-center justify-center">
-       
+        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+          isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+        }`}>
+          <FiLink size={24} className={isDarkMode ? 'text-gray-400' : 'text-gray-500'} />
+        </div>
+        <h3 className="text-lg font-medium mb-2">No Node Selected</h3>
+        <p className="text-center opacity-70">
+          Click on any node to view and edit its details here.
+          <br />
+          Hover over nodes for quick information.
+        </p>
       </div>
     );
   }
@@ -178,26 +188,7 @@ export const SidePanel = ({
             </h3>
           </div>
           
-          <div className="flex flex-wrap gap-2 mb-3">
-            {displayNode.data.tags?.map((tag, index) => (
-              <span 
-                key={index}
-                className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm ${
-                  isDarkMode 
-                    ? 'bg-gray-700' 
-                    : 'bg-blue-100 text-blue-800'
-                }`}
-              >
-                {tag}
-                <button
-                  onClick={() => handleRemoveTag(tag)}
-                  className="opacity-70 hover:opacity-100"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
+
         
           <div className="flex gap-2">
             <input
